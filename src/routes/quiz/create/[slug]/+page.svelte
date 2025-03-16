@@ -4,6 +4,7 @@
   let { data } = $props();
   let { supabase } = $derived(data);
 
+  let exam = data.exam;
   let questions = $state(data.questions);
   let newQuestionText = $state("");
   let newOptionText = $state({});
@@ -14,7 +15,7 @@
 
     const { data: question, error } = await supabase
       .from("questions")
-      .insert([{ question: newQuestionText, exam_id: data.slug }])
+      .insert([{ question: newQuestionText, exam_id: exam.id }])
       .select()
       .single();
 
@@ -143,6 +144,20 @@
     );
   }
 
+  async function updateExam(examId, newName) {
+    if (!newName.trim()) return;
+
+    const { error } = await supabase
+      .from("exams")
+      .update({ name: newName })
+      .eq("id", examId);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+  }
+
   async function toggleCorrect(optionId, questionId, isCorrect) {
     const { error } = await supabase
       .from("options")
@@ -177,7 +192,7 @@
 
       const { data: questionData, error: questionError } = await supabase
         .from("questions")
-        .insert([{ question: questionText.trim(), exam_id: data.slug }])
+        .insert([{ question: questionText.trim(), exam_id: exam.id }])
         .select()
         .single();
 
@@ -227,13 +242,23 @@
     questions = [...questions, ...newQuestions];
     bulkPasteText = "";
   }
+
+  console.log(exam);
 </script>
 
 <div class="flex flex-col items-center">
   <div class="w-full max-w-2xl space-y-8">
-    <div>
-      <h1 class="text-3xl font-bold text-center">Edit Quiz</h1>
-      <p class="text-gray-400 text-center">Manage questions and answers.</p>
+    <div class="flex flex-col justify-center items-center">
+      <h1 class="text-2xl font-semibold text-center">
+        {exam?.subject?.name || "Subject"}
+      </h1>
+
+      <input
+        type="text"
+        bind:value={exam.name}
+        class="text-lg font-medium text-gray-400 text-center cursor-pointer w-fit"
+        onchange={() => updateExam(exam?.id, exam?.name)}
+      />
     </div>
 
     <!-- Questions Section -->

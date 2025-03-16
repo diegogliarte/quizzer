@@ -2,8 +2,9 @@ import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
   const { data: subjects, error: subjectsError } = await locals.supabase
-      .from("subjects")
-      .select(`
+    .from("subjects")
+    .select(
+      `
       id, 
       name, 
       exams (
@@ -12,11 +13,12 @@ export const load: PageServerLoad = async ({ locals }) => {
         subject_id,
         questions: questions (id)
       )
-    `)
-      .eq("is_deleted", false)
-      .eq("exams.is_deleted", false)
-      .eq("exams.questions.is_deleted", false)
-      .order("id", { ascending: true });
+    `,
+    )
+    .eq("is_deleted", false)
+    .eq("exams.is_deleted", false)
+    .eq("exams.questions.is_deleted", false)
+    .order("id", { ascending: true });
 
   if (subjectsError) {
     console.error("Error fetching subjects:", subjectsError);

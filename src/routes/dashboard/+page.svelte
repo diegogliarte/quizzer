@@ -21,8 +21,14 @@
         {#each subject.exams as exam}
           <div class="relative flex items-center group">
             <!-- Exam Name (Clickable) + Question Count -->
-            <a href={"/quiz/" + exam.id} class="cursor-pointer hover:underline pl-6">
-              {exam.name} <span class="text-gray-400 text-sm">({exam.questionCount} questions)</span>
+            <a
+              href={"/quiz/" + exam.id}
+              class="cursor-pointer hover:underline pl-6"
+            >
+              {exam.name}
+              <span class="text-gray-400 text-sm"
+                >({exam.questionCount} questions)</span
+              >
             </a>
           </div>
         {/each}

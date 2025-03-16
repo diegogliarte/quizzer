@@ -5,8 +5,6 @@
   let subjects = $state(data.subjects);
   let newSubjectName = $state("");
   let newExamName = $state({});
-  let editingSubject = $state({});
-  let editingExam = $state({});
 
   async function createSubject() {
     if (!newSubjectName.trim()) return;
@@ -90,6 +88,24 @@
         : subject,
     );
   }
+
+  async function updateSubject(subjectId, newName) {
+    if (!newName.trim()) return;
+
+    const { error } = await supabase
+      .from("subjects")
+      .update({ name: newName })
+      .eq("id", subjectId);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    subjects = subjects.map((subject) =>
+      subject.id === subjectId ? { ...subject, name: newName } : subject,
+    );
+  }
 </script>
 
 <div class="flex flex-col items-center">
@@ -110,9 +126,12 @@
         </button>
 
         <!-- Subject Name -->
-        <h2 class="text-lg font-semibold cursor-pointer hover:underline pl-6">
-          {subject.name}
-        </h2>
+        <input
+          type="text"
+          bind:value={subject.name}
+          class="text-lg font-semibold cursor-pointer pl-6 outline-none"
+          onchange={() => updateSubject(subject.id, subject.name)}
+        />
       </div>
 
       <div class="ml-6 mt-2 space-y-2">
@@ -127,8 +146,14 @@
             </button>
 
             <!-- Exam Name -->
-            <a href={"/quiz/create/" + exam.id} class="cursor-pointer hover:underline pl-6">
-              {exam.name} <span class="text-gray-400 text-sm">({exam.questionCount} questions)</span>
+            <a
+              href={"/quiz/create/" + exam.id}
+              class="cursor-pointer hover:underline pl-6"
+            >
+              {exam.name}
+              <span class="text-gray-400 text-sm"
+                >({exam.questionCount} questions)</span
+              >
             </a>
           </div>
         {/each}
